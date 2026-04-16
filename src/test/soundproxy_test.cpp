@@ -314,6 +314,27 @@ TEST_F(SoundSourceProxyTest, TOAL_TPE2) {
     EXPECT_TRUE(trackMetadata.getTrackInfo().getComment().isNull());
 }
 
+TEST_F(SoundSourceProxyTest, explicitImportResetsMissingAlbumArtistAndComment) {
+    auto pTrack = Track::newTemporary(
+            getTestDir().filePath(QStringLiteral("id3-test-data/empty.mp3")));
+    SoundSourceProxy proxy(pTrack);
+
+    mixxx::TrackMetadata trackMetadata;
+    trackMetadata.refAlbumInfo().setArtist(QStringLiteral("Existing Album Artist"));
+    trackMetadata.refTrackInfo().setComment(QStringLiteral("Existing comment"));
+
+    // Protect explicit user-triggered "Import From File Tags" semantics:
+    // with reset enabled, metadata that is missing in tags must be cleared.
+    constexpr auto resetMissingTagMetadata = true;
+    EXPECT_EQ(mixxx::MetadataSource::ImportResult::Succeeded,
+            proxy.importTrackMetadataAndCoverImage(
+                         &trackMetadata, nullptr, resetMissingTagMetadata)
+                    .first);
+
+    EXPECT_TRUE(trackMetadata.getAlbumInfo().getArtist().isEmpty());
+    EXPECT_TRUE(trackMetadata.getTrackInfo().getComment().isEmpty());
+}
+
 TEST_F(SoundSourceProxyTest, seekForwardBackward) {
     constexpr SINT kReadFrameCount = 10000;
 
