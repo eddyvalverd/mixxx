@@ -9,7 +9,6 @@
 #include "library/coverartcache.h"
 #include "library/coverartutils.h"
 #include "library/dlgtagfetcher.h"
-#include "library/library_prefs.h"
 #include "library/trackmodel.h"
 #include "moc_dlgtrackinfo.cpp"
 #include "preferences/colorpalettesettings.h"
@@ -927,10 +926,9 @@ void DlgTrackInfo::slotImportMetadataFromFile() {
     mixxx::TrackRecord trackRecord = m_pLoadedTrack->getRecord();
     mixxx::TrackMetadata trackMetadata = trackRecord.getMetadata();
 
-    const auto resetMissingTagMetadata =
-            m_pUserSettings->getValue<bool>(
-                    mixxx::library::prefs::
-                            kResetMissingTagMetadataOnImportConfigKey);
+    // Explicit re-import should mirror file tags exactly, including clearing
+    // fields that are missing from tags in the file.
+    const auto resetMissingTagMetadata = true;
 
     constexpr QImage* pNoCoverImport = nullptr;
 

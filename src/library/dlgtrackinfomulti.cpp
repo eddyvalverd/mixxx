@@ -8,7 +8,6 @@
 #include "defs_urls.h"
 #include "library/coverartcache.h"
 #include "library/coverartutils.h"
-#include "library/library_prefs.h"
 #include "moc_dlgtrackinfomulti.cpp"
 #include "preferences/colorpalettesettings.h"
 #include "sources/soundsourceproxy.h"
@@ -785,8 +784,9 @@ void DlgTrackInfoMulti::slotImportMetadataFromFiles() {
         auto trackRecord = pTrack->getRecord();
         auto trackMetadata = trackRecord.getMetadata();
         QImage coverImage;
-        const auto resetMissingTagMetadata = m_pUserSettings->getValue<bool>(
-                mixxx::library::prefs::kResetMissingTagMetadataOnImportConfigKey);
+        // Explicit bulk re-import should mirror file tags exactly, including
+        // clearing fields that are missing from tags in the file.
+        const auto resetMissingTagMetadata = true;
         const auto [importResult, sourceSynchronizedAt] =
                 SoundSourceProxy(pTrack)
                         .importTrackMetadataAndCoverImage(

@@ -1452,6 +1452,8 @@ class ImportMetadataFromFileTagsTrackPointerOperation : public mixxx::TrackPoint
     explicit ImportMetadataFromFileTagsTrackPointerOperation(
             const UserSettings& userSettings)
             : m_params(SyncTrackMetadataParams::readFromUserSettings(userSettings)) {
+        // Explicit import is user-authoritative and should clear missing values.
+        m_params.resetMissingTagMetadataOnImport = true;
     }
 
   private:
@@ -1465,7 +1467,7 @@ class ImportMetadataFromFileTagsTrackPointerOperation : public mixxx::TrackPoint
                 m_params);
     }
 
-    const SyncTrackMetadataParams m_params;
+    SyncTrackMetadataParams m_params;
 };
 
 } // anonymous namespace
